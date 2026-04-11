@@ -1,4 +1,4 @@
-# Telegram Parser
+# MegaParser — Hamster Club
 
 Самостоятельно размещаемый веб-сервис для парсинга публичных Telegram-каналов, AI-переписывания постов и их публикации в собственные каналы через Bot API.
 
@@ -7,120 +7,123 @@
 ## Требования
 
 - Python 3.11+
-- Node.js 18+
-- PostgreSQL 14+
-- Telegram API credentials ([my.telegram.org](https://my.telegram.org))
-- Telegram Bot token ([@BotFather](https://t.me/BotFather))
-- OpenAI API key ([platform.openai.com](https://platform.openai.com))
+- - Node.js 18+
+  - - PostgreSQL 14+
+    - - Telegram API credentials ([my.telegram.org](https://my.telegram.org))
+      - - Telegram Bot token ([@BotFather](https://t.me/BotFather))
+        - - OpenAI API key ([platform.openai.com](https://platform.openai.com))
+         
+          - ## Быстрый старт
+         
+          - ### 1. Клонировать репозиторий
+         
+          - ```bash
+            git clone git@github.com:Dimks777/megaparser.git
+            cd megaparser
+            ```
 
-## Быстрый старт
+            ### 2. Создать базу данных
 
-### 1. Клонировать репозиторий
+            ```sql
+            CREATE DATABASE telegram_parser;
+            ```
 
-```bash
-git clone git@github.com:Dimks777/megaparser.git
-cd megaparser
-```
+            ### 3. Настроить переменные окружения
 
-### 2. Создать базу данных
+            ```bash
+            cp .env.example .env
+            ```
 
-```sql
-CREATE DATABASE telegram_parser;
-```
+            Отредактируйте `.env` и заполните все значения:
 
-### 3. Настроить переменные окружения
+            | Переменная | Описание |
+            |---|---|
+            | `TELEGRAM_API_ID` | `api_id` приложения с [my.telegram.org](https://my.telegram.org) |
+            | `TELEGRAM_API_HASH` | `api_hash` приложения с [my.telegram.org](https://my.telegram.org) |
+            | `TELEGRAM_BOT_TOKEN` | Токен бота от [@BotFather](https://t.me/BotFather). Бот должен быть **администратором** во всех целевых каналах |
+            | `OPENAI_API_KEY` | API-ключ с [platform.openai.com](https://platform.openai.com) |
+            | `DATABASE_URL` | Строка подключения PostgreSQL, например `postgresql+asyncpg://user:password@localhost:5432/telegram_parser` |
+            | `ALLOWED_USER_ID` | Ваш числовой Telegram user ID (узнайте через [@userinfobot](https://t.me/userinfobot)). Только этот пользователь может войти |
 
-```bash
-cp .env.example .env
-```
+            ### 4. Запустить бэкенд
 
-Отредактируйте `.env` и заполните все значения:
+            ```bash
+            cd backend
+            python -m venv venv
+            source venv/bin/activate  # Windows: venv\Scripts\activate
+            pip install -r requirements.txt
+            alembic upgrade head
+            uvicorn main:app --reload --port 8000
+            ```
 
-| Переменная | Описание |
-|---|---|
-| `TELEGRAM_API_ID` | `api_id` приложения с [my.telegram.org](https://my.telegram.org) |
-| `TELEGRAM_API_HASH` | `api_hash` приложения с [my.telegram.org](https://my.telegram.org) |
-| `TELEGRAM_BOT_TOKEN` | Токен бота от [@BotFather](https://t.me/BotFather). Бот должен быть **администратором** во всех целевых каналах |
-| `OPENAI_API_KEY` | API-ключ с [platform.openai.com](https://platform.openai.com) |
-| `DATABASE_URL` | Строка подключения PostgreSQL, например `postgresql+asyncpg://user:password@localhost:5432/telegram_parser` |
-| `ALLOWED_USER_ID` | Ваш числовой Telegram user ID (узнайте через [@userinfobot](https://t.me/userinfobot)). Только этот пользователь может войти |
+            ### 5. Запустить фронтенд
 
-### 4. Запустить бэкенд
+            ```bash
+            cd frontend
+            npm install
+            npm run dev
+            ```
 
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-alembic upgrade head
-uvicorn main:app --reload --port 8000
-```
+            Откройте [http://localhost:5173](http://localhost:5173)
 
-### 5. Запустить фронтенд
+            ## Использование
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+            1. Войдите через номер телефона Telegram (QR-код или SMS)
+            2. 2. Добавьте свои целевые каналы в разделе «Мои каналы»
+               3. 3. Добавьте каналы-источники и привяжите их к своим каналам
+                  4. 4. Нажмите на канал-источник → «Получить посты» — спарсятся последние публикации
+                     5. 5. Нажмите на пост → «Переписать с AI» → отредактируйте при необходимости → «Опубликовать»
+                       
+                        6. ## Деплой на сервер
+                       
+                        7. Примеры конфигурации для деплоя на Linux-сервере находятся в папке `deploy/`:
+                       
+                        8. - `nginx.conf` — Nginx reverse proxy с SSL
+                           - - `megaparser.service` — systemd-юнит для бэкенда
+                             - - `deploy.sh` — скрипт для pull, сборки и перезапуска
+                              
+                               - ```bash
+                                 # Сборка фронтенда для продакшена
+                                 cd frontend && npm run build
 
-Откройте http://localhost:5173
+                                 # Запуск бэкенда через uvicorn
+                                 cd backend && uvicorn main:app --host 127.0.0.1 --port 8000 --workers 1
+                                 ```
 
-## Использование
+                                 ## Структура проекта
 
-1. Войдите через номер телефона Telegram (QR-код или SMS)
-2. Добавьте свои целевые каналы в разделе «Мои каналы»
-3. Добавьте каналы-источники и привяжите их к своим каналам
-4. Нажмите на канал-источник → «Получить посты» — спарсятся последние публикации
-5. Нажмите на пост → «Переписать с AI» → отредактируйте при необходимости → «Опубликовать»
+                                 ```
+                                 backend/
+                                   main.py            # FastAPI приложение, запуск, CORS
+                                   config.py          # Pydantic настройки из .env
+                                   models.py          # SQLAlchemy модели
+                                   database.py        # Async engine & session
+                                   telegram_client.py # Telethon MTProto клиент (парсинг и загрузка медиа)
+                                   bot_publisher.py   # Bot API паблишер (sendMessage / sendPhoto / sendMediaGroup)
+                                   ai_rewriter.py     # Переписывание через OpenAI GPT-4o
+                                   routers/
+                                     auth.py          # Вход по телефону, QR-вход, управление сессией
+                                     channels.py      # CRUD каналов и источников
+                                     posts.py         # Список постов, переписывание, публикация, отклонение
+                                     admin.py         # Эндпоинты админ-панели
+                                   alembic/           # Миграции базы данных
+                                 frontend/
+                                   src/
+                                     pages/           # Login, Dashboard, Admin
+                                     components/      # Sidebar, PostCard, PostEditor
+                                     api/client.ts    # Axios клиент
+                                 deploy/              # Nginx, systemd, деплой-скрипт
+                                 ```
 
-## Деплой на сервер
+                                 ## Лицензия
 
-Примеры конфигурации для деплоя на Linux-сервере находятся в папке `deploy/`:
+                                 MIT
 
-- `nginx.conf` — Nginx reverse proxy с SSL
-- `megaparser.service` — systemd-юнит для бэкенда
-- `deploy.sh` — скрипт для pull, сборки и перезапуска
+                                 ---
 
-```bash
-# Сборка фронтенда для продакшена
-cd frontend
-npm run build
+                                 🐹 Часть проекта [hamster.club](https://hamster.club) — клуб AI-энтузиастов InvestClub.
 
-# Запуск бэкенда через uvicorn
-cd backend
-uvicorn main:app --host 127.0.0.1 --port 8000 --workers 1
-```
-
-## Структура проекта
-
-```
-backend/
-  main.py              # FastAPI приложение, запуск, CORS
-  config.py            # Pydantic настройки из .env
-  models.py            # SQLAlchemy модели
-  database.py          # Async engine & session
-  telegram_client.py   # Telethon MTProto клиент (парсинг и загрузка медиа)
-  bot_publisher.py     # Bot API паблишер (sendMessage / sendPhoto / sendMediaGroup)
-  ai_rewriter.py       # Переписывание через OpenAI GPT-4o
-  routers/
-    auth.py            # Вход по телефону, QR-вход, управление сессией
-    channels.py        # CRUD каналов и источников
-    posts.py           # Список постов, переписывание, публикация, отклонение
-    admin.py           # Эндпоинты админ-панели
-  alembic/             # Миграции базы данных
-frontend/
-  src/
-    pages/             # Login, Dashboard, Admin
-    components/        # Sidebar, PostCard, PostEditor
-    api/client.ts      # Axios клиент
-deploy/                # Nginx, systemd, деплой-скрипт
-```
-
-## Лицензия
-
-MIT
-
----
-
-> Разработано и поддерживается командой [hamster.club](https://hamster.club)
+                                 🤖 Связанные продукты клуба:
+                                 - [Dimks777/content-factory](https://github.com/Dimks777/content-factory) — Контент-завод для 8 соцсетей
+                                 - - [Dimks777/aiclub](https://github.com/Dimks777/aiclub) — Полная Фабрика Контента (5 AI-агентов)
+                                   - - [Dimks777/aiclublight](https://github.com/Dimks777/aiclublight) — Lite-версия Фабрики Контента
