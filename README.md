@@ -1,10 +1,10 @@
 # Telegram Parser
 
-Self-hosted web service for parsing public Telegram channels, AI-rewriting posts, and publishing them to your own channels via Bot API.
+Самостоятельно размещаемый веб-сервис для парсинга публичных Telegram-каналов, AI-переписывания постов и их публикации в собственные каналы через Bot API.
 
-**Stack:** FastAPI + SQLAlchemy async, React 18 + Vite + TypeScript, PostgreSQL.
+**Стек:** FastAPI + SQLAlchemy async, React 18 + Vite + TypeScript, PostgreSQL.
 
-## Requirements
+## Требования
 
 - Python 3.11+
 - Node.js 18+
@@ -13,39 +13,39 @@ Self-hosted web service for parsing public Telegram channels, AI-rewriting posts
 - Telegram Bot token ([@BotFather](https://t.me/BotFather))
 - OpenAI API key ([platform.openai.com](https://platform.openai.com))
 
-## Getting Started
+## Быстрый старт
 
-### 1. Clone the repository
+### 1. Клонировать репозиторий
 
 ```bash
 git clone git@github.com:Dimks777/megaparser.git
 cd megaparser
 ```
 
-### 2. Create the database
+### 2. Создать базу данных
 
 ```sql
 CREATE DATABASE telegram_parser;
 ```
 
-### 3. Configure environment variables
+### 3. Настроить переменные окружения
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and fill in all values:
+Отредактируйте `.env` и заполните все значения:
 
-| Variable | Description |
+| Переменная | Описание |
 |---|---|
-| `TELEGRAM_API_ID` | App `api_id` from [my.telegram.org](https://my.telegram.org) |
-| `TELEGRAM_API_HASH` | App `api_hash` from [my.telegram.org](https://my.telegram.org) |
-| `TELEGRAM_BOT_TOKEN` | Bot token from [@BotFather](https://t.me/BotFather). The bot must be added as **admin** to all target channels |
-| `OPENAI_API_KEY` | API key from [platform.openai.com](https://platform.openai.com) |
-| `DATABASE_URL` | PostgreSQL connection string, e.g. `postgresql+asyncpg://user:password@localhost:5432/telegram_parser` |
-| `ALLOWED_USER_ID` | Your numeric Telegram user ID (get it from [@userinfobot](https://t.me/userinfobot)). Only this user can log in |
+| `TELEGRAM_API_ID` | `api_id` приложения с [my.telegram.org](https://my.telegram.org) |
+| `TELEGRAM_API_HASH` | `api_hash` приложения с [my.telegram.org](https://my.telegram.org) |
+| `TELEGRAM_BOT_TOKEN` | Токен бота от [@BotFather](https://t.me/BotFather). Бот должен быть **администратором** во всех целевых каналах |
+| `OPENAI_API_KEY` | API-ключ с [platform.openai.com](https://platform.openai.com) |
+| `DATABASE_URL` | Строка подключения PostgreSQL, например `postgresql+asyncpg://user:password@localhost:5432/telegram_parser` |
+| `ALLOWED_USER_ID` | Ваш числовой Telegram user ID (узнайте через [@userinfobot](https://t.me/userinfobot)). Только этот пользователь может войти |
 
-### 4. Start the backend
+### 4. Запустить бэкенд
 
 ```bash
 cd backend
@@ -56,7 +56,7 @@ alembic upgrade head
 uvicorn main:app --reload --port 8000
 ```
 
-### 5. Start the frontend
+### 5. Запустить фронтенд
 
 ```bash
 cd frontend
@@ -64,63 +64,63 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173
+Откройте http://localhost:5173
 
-## Usage
+## Использование
 
-1. Log in with your Telegram phone number (QR code or SMS)
-2. Add your target channel(s) under "My Channels"
-3. Add source channels and link them to your channels
-4. Click a source channel → "Fetch Posts" to parse latest posts
-5. Click a post → "Rewrite with AI" → edit if needed → "Publish"
+1. Войдите через номер телефона Telegram (QR-код или SMS)
+2. Добавьте свои целевые каналы в разделе «Мои каналы»
+3. Добавьте каналы-источники и привяжите их к своим каналам
+4. Нажмите на канал-источник → «Получить посты» — спарсятся последние публикации
+5. Нажмите на пост → «Переписать с AI» → отредактируйте при необходимости → «Опубликовать»
 
-## Production Deployment
+## Деплой на сервер
 
-Example configs for deployment on a Linux server are in the `deploy/` directory:
+Примеры конфигурации для деплоя на Linux-сервере находятся в папке `deploy/`:
 
-- `nginx.conf` — Nginx reverse proxy with SSL
-- `megaparser.service` — systemd unit for the backend
-- `deploy.sh` — pull, build, and restart script
+- `nginx.conf` — Nginx reverse proxy с SSL
+- `megaparser.service` — systemd-юнит для бэкенда
+- `deploy.sh` — скрипт для pull, сборки и перезапуска
 
 ```bash
-# Build frontend for production
+# Сборка фронтенда для продакшена
 cd frontend
 npm run build
 
-# Run backend with uvicorn
+# Запуск бэкенда через uvicorn
 cd backend
 uvicorn main:app --host 127.0.0.1 --port 8000 --workers 1
 ```
 
-## Project Structure
+## Структура проекта
 
 ```
 backend/
-  main.py              # FastAPI app, startup, CORS
-  config.py            # Pydantic settings from .env
-  models.py            # SQLAlchemy models
+  main.py              # FastAPI приложение, запуск, CORS
+  config.py            # Pydantic настройки из .env
+  models.py            # SQLAlchemy модели
   database.py          # Async engine & session
-  telegram_client.py   # Telethon MTProto client (parsing & media download)
-  bot_publisher.py     # Bot API publisher (sendMessage / sendPhoto / sendMediaGroup)
-  ai_rewriter.py       # OpenAI GPT-4o rewriter
+  telegram_client.py   # Telethon MTProto клиент (парсинг и загрузка медиа)
+  bot_publisher.py     # Bot API паблишер (sendMessage / sendPhoto / sendMediaGroup)
+  ai_rewriter.py       # Переписывание через OpenAI GPT-4o
   routers/
-    auth.py            # Phone login, QR login, session management
-    channels.py        # My channels & source channels CRUD
-    posts.py           # Post list, rewrite, publish, discard
-    admin.py           # Admin panel endpoints
-  alembic/             # Database migrations
+    auth.py            # Вход по телефону, QR-вход, управление сессией
+    channels.py        # CRUD каналов и источников
+    posts.py           # Список постов, переписывание, публикация, отклонение
+    admin.py           # Эндпоинты админ-панели
+  alembic/             # Миграции базы данных
 frontend/
   src/
     pages/             # Login, Dashboard, Admin
     components/        # Sidebar, PostCard, PostEditor
-    api/client.ts      # Axios client
-deploy/                # Nginx, systemd, deploy script
+    api/client.ts      # Axios клиент
+deploy/                # Nginx, systemd, деплой-скрипт
 ```
 
-## License
+## Лицензия
 
 MIT
 
 ---
 
-> Developed and maintained by [hamster.club](https://hamster.club)
+> Разработано и поддерживается командой [hamster.club](https://hamster.club)
