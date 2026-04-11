@@ -18,7 +18,7 @@ Self-hosted web service for parsing public Telegram channels, AI-rewriting posts
 ### 1. Clone the repository
 
 ```bash
-git clone git@github.com:artanov/megaparser.git
+git clone git@github.com:Dimks777/megaparser.git
 cd megaparser
 ```
 
@@ -120,3 +120,7 @@ deploy/                # Nginx, systemd, deploy script
 ## License
 
 MIT
+
+---
+
+> Developed and maintained by [hamster.club](https://hamster.club)
